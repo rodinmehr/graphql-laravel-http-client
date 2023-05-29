@@ -87,7 +87,7 @@
         document.getElementById("form").addEventListener('submit', (e) => {
             e.preventDefault();
             data = {
-            query: `
+                query: `
                 mutation createANewArticle($title: String!, $body: String!) {
                     CreateArticle(title: $title, body: $body) {
                         id
@@ -100,9 +100,48 @@
                     }
                 }
                 `,
+                variables: {
+                    title: document.getElementById("title").value,
+                    body: document.getElementById("body").value
+                }
+            }
+
+            fetch("http://localhost:8000/graphql", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(res => res.json())
+                .then(res => console.log(res))
+                .catch(err => console.log(err));
+        });
+
+        data = {
+            query: `
+                query getTwoUsers($userIdOne: Int!, $userIdTwo: Int!) {
+                    userA: user(id: $userIdOne) {
+                        name
+                        email
+                        articles {
+                            title
+                            body
+                        }
+                    }
+                    userB: user(id: $userIdTwo) {
+                        name
+                        email
+                        articles {
+                            title
+                            body
+                        }
+                    }
+                }
+                `,
             variables: {
-                title: document.getElementById("title").value,
-                body: document.getElementById("body").value
+                userIdOne: 1,
+                userIdTwo: 2
             }
         }
 
@@ -116,7 +155,53 @@
             .then(res => res.json())
             .then(res => console.log(res))
             .catch(err => console.log(err));
-        });
+
+        data = {
+            query: `
+                query getTwoUsers($userIdOne: Int!, $userIdTwo: Int!, $userIdThree: Int!) {
+                    userA: user(id: $userIdOne) {
+                        id
+                        ...userFields
+                    }
+                    userB: user(id: $userIdTwo) {
+                        ...userFields
+                        articles {
+                            comments {
+                                id
+                            }
+                        }
+                    }
+                    userC: user(id: $userIdThree) {
+                        ...userFields
+                    }
+                }
+
+                fragment userFields on User {
+                    name
+                    email
+                    articles {
+                        title
+                        body
+                    }
+                }
+                `,
+            variables: {
+                userIdOne: 1,
+                userIdTwo: 2,
+                userIdThree: 3
+            }
+        }
+
+        fetch("http://localhost:8000/graphql", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(res => console.log(res))
+            .catch(err => console.log(err));
     </script>
 </body>
 
