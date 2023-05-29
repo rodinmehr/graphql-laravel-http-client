@@ -15,6 +15,7 @@
         <div class="row">
             <div class="col">
                 <div id="logined-user"></div>
+                <div id="user-token" class="d-none"></div>
             </div>
         </div>
         <div class="row">
@@ -27,6 +28,21 @@
                 <div class="form-group">
                     <label for="body">Body</label>
                     <input type="text" id="body" name="body" class="form-control">
+                </div>
+                <button type="submit" class="btn btn-danger mt-4">Send</button>
+            </form>
+        </div>
+        <hr>
+        <div class="row">
+            <form action="" id="form-update" class="mt-5 col p-2">
+                <h3 class="text-center">Update Article</h3>
+                <div class="form-group">
+                    <label for="title-update">Title</label>
+                    <input type="text" id="title-update" name="title-update" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="body-update">Body</label>
+                    <input type="text" id="body-update" name="body-update" class="form-control">
                 </div>
                 <button type="submit" class="btn btn-danger mt-4">Send</button>
             </form>
@@ -67,6 +83,7 @@
         </div>
     </div>
     <script>
+        // getSingleUser
         let data = {
             query: `
                 query getSingleUser($userId: Int!) {
@@ -81,17 +98,20 @@
             }
         }
 
-        fetch("http://localhost:8000/graphql", {
+        fetch("http://localhost:8000/graphql/user", {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + document.getElementById('user-token').innerHTML,
                 },
                 body: JSON.stringify(data)
             })
             .then(res => res.json())
-            .then(res => console.log(res))
+            .then(res => console.log("Single User:", res))
             .catch(err => console.log(err));
 
+        // getAllUsers
         data = {
             query: `
                 query getAllUsers {
@@ -113,17 +133,20 @@
             }
         }
 
-        fetch("http://localhost:8000/graphql", {
+        fetch("http://localhost:8000/graphql/user", {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + document.getElementById('user-token').innerHTML,
                 },
                 body: JSON.stringify(data)
             })
             .then(res => res.json())
-            .then(res => console.log(res))
+            .then(res => console.log("All users:", res))
             .catch(err => console.log(err));
 
+        // createANewArticle
         document.getElementById("form").addEventListener('submit', (e) => {
             e.preventDefault();
             data = {
@@ -146,10 +169,12 @@
                 }
             }
 
-            fetch("http://localhost:8000/graphql", {
+            fetch("http://localhost:8000/graphql/user", {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + document.getElementById('user-token').innerHTML,
                     },
                     body: JSON.stringify(data)
                 })
@@ -158,6 +183,45 @@
                 .catch(err => console.log(err));
         });
 
+        // update article
+        document.getElementById("form-update").addEventListener('submit', (e) => {
+            e.preventDefault();
+            data = {
+                query: `
+                mutation updateArticle($id: Int!, $title: String, $body: String) {
+                    UpdateArticle(id: $id, title: $title, body: $body) {
+                        id
+                        title
+                        body
+                        user {
+                            name
+                            email
+                        }
+                    }
+                }
+                `,
+                variables: {
+                    id: 162,
+                    title: document.getElementById("title-update").value,
+                    body: document.getElementById("body-update").value
+                }
+            }
+
+            fetch("http://localhost:8000/graphql/user", {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + document.getElementById('user-token').innerHTML,
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(res => res.json())
+                .then(res => console.log(res))
+                .catch(err => console.log(err));
+        });
+
+        // getTwoUsers
         data = {
             query: `
                 query getTwoUsers($userIdOne: Int!, $userIdTwo: Int!) {
@@ -185,20 +249,23 @@
             }
         }
 
-        fetch("http://localhost:8000/graphql", {
+        // getThreeUsers
+        fetch("http://localhost:8000/graphql/user", {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + document.getElementById('user-token').innerHTML,
                 },
                 body: JSON.stringify(data)
             })
             .then(res => res.json())
-            .then(res => console.log(res))
+            .then(res => console.log("Two Users:", res))
             .catch(err => console.log(err));
 
         data = {
             query: `
-                query getTwoUsers($userIdOne: Int!, $userIdTwo: Int!, $userIdThree: Int!) {
+                query getThreeUsers($userIdOne: Int!, $userIdTwo: Int!, $userIdThree: Int!) {
                     userA: user(id: $userIdOne) {
                         id
                         ...userFields
@@ -232,15 +299,18 @@
             }
         }
 
-        fetch("http://localhost:8000/graphql", {
+        // createANewUser
+        fetch("http://localhost:8000/graphql/user", {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + document.getElementById('user-token').innerHTML,
                 },
                 body: JSON.stringify(data)
             })
             .then(res => res.json())
-            .then(res => console.log(res))
+            .then(res => console.log("Three Users:", res))
             .catch(err => console.log(err));
 
         document.getElementById("register-form").addEventListener('submit', (e) => {
@@ -265,18 +335,30 @@
                 }
             }
 
+            // Register User
             fetch("http://localhost:8000/graphql", {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
                     },
                     body: JSON.stringify(data)
                 })
                 .then(res => res.json())
-                .then(res => console.log(res))
+                .then(res => {
+                    console.log("Register User:", res);
+                    if (res.data.RegisterUser !== null) {
+                        document.getElementById("logined-user").innerHTML = "Hello, " + res.data.RegisterUser.user.name;
+                        document.getElementById("user-token").innerHTML = res.data.RegisterUser.token;
+                    } else {
+                        document.getElementById("logined-user").innerHTML = "";
+                        document.getElementById("user-token").innerHTML = "";
+                    }
+                })
                 .catch(err => console.log(err));
         });
 
+        // loginUser
         document.getElementById("login-form").addEventListener('submit', (e) => {
             e.preventDefault();
             data = {
@@ -301,17 +383,20 @@
             fetch("http://localhost:8000/graphql", {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
                     },
                     body: JSON.stringify(data)
                 })
                 .then(res => res.json())
                 .then(res => {
                     console.log(res);
-                    if(res.data.LoginUser !== null) {
+                    if (res.data.LoginUser !== null) {
                         document.getElementById("logined-user").innerHTML = "Hello, " + res.data.LoginUser.user.name;
+                        document.getElementById("user-token").innerHTML = res.data.LoginUser.token;
                     } else {
                         document.getElementById("logined-user").innerHTML = "";
+                        document.getElementById("user-token").innerHTML = "";
                     }
                 })
                 .catch(err => console.log(err));
