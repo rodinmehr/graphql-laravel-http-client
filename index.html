@@ -34,6 +34,38 @@
         .then(res => res.json())
         .then(res => console.log(res))
         .catch(err => console.log(err));
+
+        data = {
+            query: `
+                query getAllUsers {
+                    allUsers(page: 2) {
+                        data {
+                           name
+                            email
+                            articles {
+                                title
+                                body
+                            } 
+                        }
+                        total
+                    }
+                }
+                `,
+            variables: {
+                
+            }
+        }
+
+        fetch("http://localhost:8000/graphql", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(res => res.json())
+        .then(res => console.log(res))
+        .catch(err => console.log(err));
     </script>
 </body>
 
